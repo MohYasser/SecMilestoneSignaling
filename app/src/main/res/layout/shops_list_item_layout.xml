@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/card_view_corner_radius"
+    app:cardElevation="2dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_max"
+            android:id="@+id/shop_container"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/product_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Shop Name"
+                style="@style/SecondaryTextTheme"
+                />
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Price"
+                style="@style/SecondaryTextTheme"
+                />
+            <TextView
+                android:id="@+id/sp_offers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Sp_offer"
+                style="@style/SecondaryTextTheme"
+                />
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Distance"
+                style="@style/SecondaryTextTheme"
+                />
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
