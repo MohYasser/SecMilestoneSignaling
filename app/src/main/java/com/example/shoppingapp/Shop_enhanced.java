@@ -41,4 +41,9 @@ public class Shop_enhanced {
     public void setShop_sp_offers(String shop_sp_offers) {
         this.shop_sp_offers = shop_sp_offers;
     }
+
+    @Override
+    public String toString() {
+        return ""+shop_price;
+    }
 }

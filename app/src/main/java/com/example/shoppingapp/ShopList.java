@@ -2,10 +2,12 @@ package com.example.shoppingapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,8 +27,8 @@ import java.util.List;
 
 public class ShopList extends AppCompatActivity {
 
-    private static  final String BASE_URL_links = "https://192.168.43.156/android_login_api/GetLinks.php";
-    private static  final String BASE_URL_shops = "https://192.168.43.156/android_login_api/GetShops.php";
+    private static  final String BASE_URL_links = "http://192.168.43.121/android_login_api/GetLinks.php";
+    private static  final String BASE_URL_shops = "http://192.168.43.121/android_login_api/GetShops.php";
 
     RecyclerView.Adapter mAdapter=null;
 
@@ -41,6 +43,7 @@ public class ShopList extends AppCompatActivity {
     private List<Shop_enhanced> fds;
 
     private TextView mShopName, mPrice, mSpOffers, mDistance;
+    private static final String TAG = RecyclerAdapter.class.getSimpleName();
 
     public ShopList() {
     }
@@ -49,18 +52,24 @@ public class ShopList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shop_layout);
+
+        //catching intent
         Intent intent = getIntent();
 
         if (intent !=null){
-            RecyclerView detailedView = findViewById(R.id.products_recyclerView);
-            RecyclerView.LayoutManager manager = new GridLayoutManager(ShopList.this, 2);
-            detailedView.setLayoutManager(manager);
+            RecyclerView detailedView = findViewById(R.id.shops_recyclerView);
+            detailedView.setHasFixedSize(true);
+            detailedView.setLayoutManager(new LinearLayoutManager(this));
 
             getLinks();
-
+            String id2=getIntent().getStringExtra("id");
             //getting product id from the last clicked product
-            int product_id = Integer.parseInt(intent.getStringExtra("id"));
+            int product_id = 0;
+            try {
+                product_id= Integer.parseInt(id2);
+            }catch(NumberFormatException e){
 
+            }
             //getting all shops ids of this product
             for (Link i : links) {
                 if(product_id==i.getProduct_id()){
@@ -82,10 +91,13 @@ public class ShopList extends AppCompatActivity {
                 int x = (int)j; //get x, which is the id number of shop j
                 for (Shop i : shops) { //looping over all the shops we want to get:
                     if(x==i.getId()){ //the shop that has one of the ids in shop_ids and put that shop's name
+                        Log.d(TAG, "333333333333333333333333333"+i.getShop_name());
                         shop_names[k] = i.getShop_name(); // in the shop_names array
+
                         shop_lat[k] = i.getLattitude(); // and put its lat in the shop_lat array
                         shop_long[k] = i.getLongitude(); // and put its long in the shop_long array
                         k++;
+                        return;
                     }
                 }
             }
@@ -101,7 +113,7 @@ public class ShopList extends AppCompatActivity {
             float dis_lat;
             float dis_long;
 
-            for(int m=0; m<k+1; m++){
+            for(int m=0; m<k; m++){
                 dis_lat = shop_lat[m]-user_lat;
                 dis_long = shop_long[m]-user_long;
                 String distance = "("+dis_lat + ", " +dis_long+")";
@@ -120,7 +132,6 @@ public class ShopList extends AppCompatActivity {
 
 
             mAdapter = new DetailedAdapter(ShopList.this, fds);
-
            detailedView.setAdapter(mAdapter);
 
 
@@ -131,32 +142,36 @@ public class ShopList extends AppCompatActivity {
 
     private void getLinks(){
         new StringRequest(Request.Method.GET, BASE_URL_links,
-                response -> {
+                new Response.Listener<String>() {
 
-                    try {
+                    @Override
+                    public void onResponse(String response) {
 
-                        JSONArray array = new JSONArray(response);
-                        for (int i = 0; i < array.length(); i++) {
+                        try {
 
-                            JSONObject object = array.getJSONObject(i);
+                            JSONArray array = new JSONArray(response);
+                            for (int i = 0; i < array.length(); i++) {
 
-                            int shop_id = Integer.parseInt(object.getString("shop_ID"));
-                            int product_id = Integer.parseInt(object.getString("product_ID"));
-                            double price = Double.parseDouble(object.getString("price"));
-                            String sp_offers = object.getString("sp_offers");
+                                JSONObject object = array.getJSONObject(i);
 
-                            Link link = new Link(shop_id, product_id, price, sp_offers);
-                            links.add(link);
+                                int shop_id = Integer.parseInt(object.getString("shop_ID"));
+                                int product_id = Integer.parseInt(object.getString("product_ID"));
+                                double price = Double.parseDouble(object.getString("price"));
+                                String sp_offers = object.getString("sp_offers");
+
+                                Link link = new Link(shop_id, product_id, price, sp_offers);
+                                links.add(link);
+                            }
+
+                        } catch (Exception e) {
+
                         }
-
-                    } catch (NumberFormatException | JSONException ignored) {
-
                     }
-                }, error -> {
-
-            /*progressBar.setVisibility(View.GONE);
-            Toast.makeText(ProductList.this, error.toString(),Toast.LENGTH_LONG).show();
-*/
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ShopList.this, error.toString(),Toast.LENGTH_LONG).show();
+            }
         });
 
     }
@@ -197,11 +212,5 @@ public class ShopList extends AppCompatActivity {
 
             }
         });
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        Volley.newRequestQueue(ShopList.this).add(stringRequest);
-
     }
 }

@@ -4,9 +4,11 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -30,23 +32,25 @@ public class ProductList extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private List<Product> products;
-    private static  final String BASE_URL = "https://192.168.43.156/android_login_api/GetProducts.php";
+    private static final String TAG = RecyclerAdapter.class.getSimpleName();
+
+    private static  final String BASE_URL = "http://192.168.43.121/android_login_api/GetProducts.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_layout);
 
-        recyclerView = findViewById(R.id.products_recyclerView);
-        RecyclerView.LayoutManager manager = new GridLayoutManager(ProductList.this, 2);
-        recyclerView.setLayoutManager(manager);
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         products = new ArrayList<>();
 
         getProducts();
 
         mAdapter = new RecyclerAdapter(ProductList.this, products);
         recyclerView.setAdapter(mAdapter);
-
     }
 
     private void getProducts (){
@@ -58,6 +62,7 @@ public class ProductList extends AppCompatActivity {
                         try {
                             JSONArray array = new JSONArray(response);
                             for (int i = 0; i<array.length(); i++){
+                                Log.d(TAG, "88888888888888888888888888888888888888 " +response);
 
                                 JSONObject object = array.getJSONObject(i);
 
@@ -70,32 +75,20 @@ public class ProductList extends AppCompatActivity {
                             }
 
                         }catch (Exception e){
+                            e.printStackTrace();
 
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(ProductList.this, error.toString(),Toast.LENGTH_LONG).show();
+
             }
 
         });
-        /*stringRequest.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 50000;
-            }
 
-            @Override
-            public int getCurrentRetryCount() {
-                return 50000;
-            }
 
-            @Override
-            public void retry(VolleyError error) throws VolleyError {
-
-            }
-        });*/
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
 }

@@ -25,10 +25,10 @@ public class DetailedAdapter extends RecyclerView.Adapter<DetailedAdapter.MyView
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView mName;
-        private final TextView mSp_offers;
-        private final TextView mPrice;
-        private final TextView mDistance;
+        TextView mName;
+        TextView mSp_offers;
+        TextView mPrice;
+        TextView mDistance;
 
         public MyViewHolder (View view){
             super(view);
@@ -41,11 +41,9 @@ public class DetailedAdapter extends RecyclerView.Adapter<DetailedAdapter.MyView
     }
 
 
-    @NonNull
-    @Override
-    public DetailedAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public DetailedAdapter.MyViewHolder onCreateViewHolder( ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(mContext).inflate(R.layout.shops_list_item_layout,parent,false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.shops_list_item_layout,null);
         return new MyViewHolder(view);
     }
 
